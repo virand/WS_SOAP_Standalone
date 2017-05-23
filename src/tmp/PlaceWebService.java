@@ -11,8 +11,14 @@ import java.util.List;
 @WebService(serviceName = "PlaceService")
 public class PlaceWebService {
     @WebMethod(operationName = "getPlaces")
-    public List<Place> getPlaces(@WebParam(name = "query", mode = WebParam.Mode.IN)String name, @WebParam(name = "description", mode = WebParam.Mode.IN)String description, @WebParam(name = "city", mode = WebParam.Mode.IN)String city, @WebParam(name = "address", mode = WebParam.Mode.IN)String address)
+    public List<Place> getPlaces(@WebParam(name = "name", mode = WebParam.Mode.IN)String name, @WebParam(name = "description", mode = WebParam.Mode.IN)String description, @WebParam(name = "city", mode = WebParam.Mode.IN)String city, @WebParam(name = "address", mode = WebParam.Mode.IN)String address) throws IllegalNameException
     {
+        if (name==null || name.trim().isEmpty())
+        {
+            PlaceServiceFault fault = PlaceServiceFault.defaultInstance();
+            throw new IllegalNameException("placeName is not specified", fault);
+        }
+
         String query= String.format("SELECT * FROM places WHERE name='%s' OR description='%s' OR city='%s' OR address='%s'", name, description, city,address);
         MySQLDAO dao = new MySQLDAO();
         List<Place> places = dao.getPlaces(query);
